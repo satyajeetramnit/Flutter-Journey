@@ -29,9 +29,11 @@ class FruitPricesChart extends StatelessWidget {
             children: <Widget>[
               Text('Fruit prices this quarter:'),
               Expanded(
-                  child: chart.BarChart(
+                  // child: chart.BarChart(
+                  child: chart.PieChart(
                 series,
                 animate: true,
+                animationDuration: Duration(seconds: 1),
               )),
             ],
           ),
