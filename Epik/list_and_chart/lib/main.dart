@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:list_and_chart/fruit_prices.dart';
 import 'package:charts_flutter/flutter.dart' as chart;
-
+import 'package:list_and_chart/lifeCycle.dart';
 import 'fruit_prices_chart.dart';
 
 void main() {
   runApp(const MaterialApp(
-    home: HomePage(),
+    home: LifeCycle(),
   ));
 }
 
@@ -57,20 +57,20 @@ class _HomePageState extends State<HomePage> {
                   itemCount: data.length,
                   itemBuilder: (BuildContext context, int index) {
                     return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal:10.0, vertical: 5.0),
-                      child: Card(
-                        child: Center(
-                          child: Text(
-                            data[index].fruit,
-                            style: TextStyle(
-                              fontSize: 20,
-                              color: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10.0, vertical: 5.0),
+                        child: Card(
+                          child: Center(
+                            child: Text(
+                              data[index].fruit,
+                              style: TextStyle(
+                                fontSize: 20,
+                                color: Colors.white,
                               ),
+                            ),
                           ),
-                          ),
-                        color: Colors.red[300],
-                      )
-                    );
+                          color: Colors.red[300],
+                        ));
                   })),
         ],
       ),
