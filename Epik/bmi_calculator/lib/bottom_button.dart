@@ -12,7 +12,7 @@ class BottomButton extends StatelessWidget {
       onTap: onTap(),
       child: Container(
         child: Center(child: Text(buttonTitle)),
-        color: Colors.teal[300],
+        color: Colors.teal[200],
         margin: EdgeInsets.only(top: 10.0),
         padding: EdgeInsets.all(8.0),
         width: double.infinity,
