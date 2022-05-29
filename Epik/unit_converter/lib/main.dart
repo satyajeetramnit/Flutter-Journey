@@ -1,191 +1,259 @@
+// ignore_for_file: prefer_const_constructors, non_constant_identifier_names, unused_field, unused_import, annotate_overrides, sort_child_properties_last, prefer_const_literals_to_create_immutables, prefer_final_fields
+
+import 'dart:ffi';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
-void main() => runApp(MyApp());
-
-class MyApp extends StatefulWidget {
-  @override
-  _MyAppState createState() => _MyAppState();
+void main() {
+  runApp(const MaterialApp(
+    home: HomePage(),
+  ));
 }
 
-class _MyAppState extends State<MyApp> {
-  final TextStyle inputStyle = TextStyle(
-    fontSize: 18,
-    color: Colors.black87,
-  );
+class HomePage extends StatefulWidget {
+  const HomePage({Key? key}) : super(key: key);
 
-  final TextStyle labelStyle = TextStyle(
-    fontSize: 20,
-    color: Colors.black,
-  );
-  String? _startMeasure;
-  String? _convertedMeasure;
-  double? _numberForm;
-  String? _resultMessage;
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  String? _original;
+  String? _Converted;
+  double? _num;
+  String? _result;
 
   void initState() {
-    _numberForm = 0;
+    _num = 0.0;
     super.initState();
   }
 
-  final List<String> _measures = [
-    'meters',
-    'kilometers',
-    'grams',
-    'kilograms',
-    'feet',
-    'miles',
-    'pounds (lbs)',
-    'ounces',
+  final List<String> _measurement = [
+    'Centimeters',
+    'Inches',
+    'Pounds',
+    'Kilograms',
   ];
-  final Map<String, int> _measuresMap = {
-    'meters': 0,
-    'kilometers': 1,
-    'grams': 2,
-    'kilograms': 3,
-    'feet': 4,
-    'miles': 5,
-    'pounds (lbs)': 6,
-    'ounces': 7,
+
+  final Map<String, int> _measurementMap = {
+    'Centimeters': 0,
+    'Inches': 1,
+    'Pounds': 2,
+    'Kilograms': 3,
   };
 
   dynamic _formulas = {
-    '0': [1, 0.001, 0, 0, 3.28084, 0.000621371, 0, 0],
-    '1': [1000, 1, 0, 0, 3280.84, 0.621371, 0, 0],
-    '2': [0, 0, 1, 0.0001, 0, 0, 0.00220462, 0.035274],
-    '3': [0, 0, 1000, 1, 0, 0, 2.20462, 35.274],
-    '4': [0.3048, 0.0003048, 0, 0, 1, 0.000189394, 0, 0],
-    '5': [1609.34, 1.60934, 0, 0, 5280, 1, 0, 0],
-    '6': [0, 0, 453.592, 0.453592, 0, 0, 1, 16],
-    '7': [0, 0, 28.3495, 0.0283495, 3.28084, 0, 0.0625, 1],
+    '0': [1, 0.393701, 0, 0],
+    '1': [2.54, 1, 0, 0],
+    '2': [0, 0, 1, 0.453592],
+    '3': [0, 0, 2.20462, 1],
   };
 
-
   void convert(double value, String from, String to) {
-    int? nFrom = _measuresMap[from];
-    int? nTo = _measuresMap[to];
-    var multiplier = _formulas[nFrom.toString()][nTo];
+    int? fromIndex = _measurementMap[from];
+    int? toIndex = _measurementMap[to];
+    var multiplier = _formulas[fromIndex.toString()][toIndex];
     var result = value * multiplier;
     if (result == 0) {
-      _resultMessage = 'This conversion cannot be performed';
+      setState(() {
+        _result = 'Invalid Conversion';
+      });
     } else {
-      _resultMessage =
-          '${_numberForm.toString()} $_startMeasure are ${result.toString()} $_convertedMeasure';
+      setState(() {
+        _result =
+            "${_num.toString()} $_original is ${result.toString()} $_Converted";
+      });
     }
-    setState(() {
-      _resultMessage = _resultMessage;
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Measures Converter',
-      home: Scaffold(
-        resizeToAvoidBottomInset: true,
-        appBar: AppBar(
-          title: Text('Measures Converter'),
-        ),
-        body: Container(
-          padding: EdgeInsets.symmetric(horizontal: 20),
+    return Scaffold(
+      backgroundColor: Color(0xff333333),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 16.0),
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Spacer(),
-              TextField(
-                style: inputStyle,
-                decoration: InputDecoration(
-                  hintText: "Please enter the value",
-                ),
-                onChanged: (text) {
-                  var rv = double.tryParse(text);
-                  if (rv != null) {
-                    setState(() {
-                      _numberForm = rv;
-                    });
-                  }
-                },
-              ),
-              Spacer(),
-              //Text((_numberForm==null)? '' : _numberForm.toString())
               Row(
+                // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  DropdownButton(
-                    style: inputStyle,
-                    hint: Text(
-                      "Unit",
-                      style: inputStyle,
-                    ),
-                    items: _measures.map((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        _startMeasure = value.toString();
-                      });
-                    },
-                    value: _startMeasure,
-                  ),
-                  Spacer(),
-                  Icon(
-                    Icons.arrow_forward,
-                    color: Colors.blue[600],
-                    size: 24.0,
-                    semanticLabel: 'Text to announce in accessibility modes',
-                  ),
-                  Spacer(),
-                  DropdownButton(
-                    hint: Text(
-                      "Unit",
-                      style: inputStyle,
-                    ),
-                    style: inputStyle,
-                    items: _measures.map((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(
-                          value,
-                          style: inputStyle,
+                  Container(
+                    child: Center(
+                      child: Text(
+                        'Unit Converter',
+                        style: TextStyle(
+                          fontSize: 35,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue[300],
+                          fontStyle: FontStyle.italic,
                         ),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
+                      ),
+                    ),
+                  ),
+                  Spacer(),
+                  // refresh icon
+                  IconButton(
+                    icon: Icon(Icons.refresh, color: Colors.white, size: 30),
+                    onPressed: () {
                       setState(() {
-                        _convertedMeasure = value.toString();
+                        _num = 0.0;
+                        _original = null;
+                        _Converted = null;
+                        _result = null;
                       });
                     },
-                    value: _convertedMeasure,
                   ),
+                  // Spacer(),
                 ],
               ),
-
-              Spacer(
-                flex: 1,
-              ),
-              RaisedButton(
-                color: Colors.blue,
-                child: Text('Convert', style: TextStyle(color: Colors.white)),
-                onPressed: () {
-                  if (_startMeasure!.isEmpty ||
-                      _convertedMeasure!.isEmpty ||
-                      _numberForm == 0) {
-                    return;
-                  } else {
-                    convert(_numberForm!, _startMeasure!, _convertedMeasure!);
-                  }
-                },
-              ),
-
-              Spacer(
-                flex: 1,
-              ),
-              Text((_resultMessage == null) ? '' : _resultMessage!
-            ,
-                  style: labelStyle),
-              Spacer(
-                flex: 8,
+              Expanded(
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 70),
+                      Container(
+                        child: TextField(
+                          decoration: InputDecoration(
+                              filled: true,
+                              fillColor: Color.fromARGB(255, 51, 51, 51),
+                              labelText: "Enter Value",
+                              labelStyle: TextStyle(
+                                fontWeight: FontWeight.w300,
+                                fontSize: 18.0,
+                                color: Colors.grey[300],
+                              )),
+                          style: const TextStyle(
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.w300,
+                            color: Colors.white,
+                          ),
+                          textAlign: TextAlign.center,
+                          keyboardType: TextInputType.number,
+                          onChanged: (text) {
+                            var rv = double.tryParse(text);
+                            if (rv != null) {
+                              setState(() {
+                                _num = rv;
+                              });
+                            }
+                          },
+                        ),
+                        decoration: BoxDecoration(
+                            color: Colors.grey[200],
+                            borderRadius: BorderRadius.circular(5),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.9),
+                                offset:
+                                    Offset(5, 5), // changes position of shadow
+                                blurRadius: 10,
+                                spreadRadius: 1,
+                              ),
+                              BoxShadow(
+                                color: Color.fromARGB(255, 91, 90, 90),
+                                offset: Offset(
+                                    -4, -4), // changes position of shadow
+                                blurRadius: 10,
+                                spreadRadius: 1,
+                              ),
+                            ]),
+                      ),
+                      SizedBox(
+                        height: 40.0,
+                      ),
+                      Row(
+                        children: [
+                          DropdownButton(
+                            dropdownColor: Colors.grey[800],
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.white,
+                            ),
+                            hint: Center(
+                                child: Text('Unit',
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 16))),
+                            items: _measurement
+                                .map((String value) => DropdownMenuItem(
+                                      child: Text(value),
+                                      value: value,
+                                    ))
+                                .toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                _original = value.toString();
+                              });
+                            },
+                            value: _original,
+                          ),
+                          Spacer(),
+                          Icon(
+                            Icons.arrow_forward,
+                            color: Colors.white,
+                            size: 30,
+                          ),
+                          Spacer(),
+                          DropdownButton(
+                            dropdownColor: Colors.grey[800],
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.white,
+                            ),
+                            hint: Center(
+                                child: Text('Unit',
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 16))),
+                            items: _measurement
+                                .map((String value) => DropdownMenuItem(
+                                      child: Text(value),
+                                      value: value,
+                                    ))
+                                .toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                _Converted = value.toString();
+                              });
+                            },
+                            value: _Converted,
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 30.0,
+                      ),
+                      Center(
+                        child: ElevatedButton(
+                          child: Text('Convert',
+                              style: TextStyle(color: Colors.white)),
+                          onPressed: () {
+                            if (_original!.isEmpty ||
+                                _Converted!.isEmpty ||
+                                _num == 0) {
+                              return;
+                            }
+                            convert(_num!, _original!, _Converted!);
+                          },
+                        ),
+                      ),
+                      SizedBox(
+                        height: 30.0,
+                      ),
+                      Center(
+                        child: Text(
+                          _result ?? '',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w300,
+                            fontStyle: FontStyle.italic,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ]),
               ),
             ],
           ),
